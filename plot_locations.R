@@ -9,7 +9,7 @@ window_size = 1000000
 p <- filter(locations) %>%
   group_by(query_chr) %>%
   mutate(gene_count = n(), max_position = max(position)) %>%
-  filter(gene_count > 15) %>%
+  filter(gene_count > 1) %>%
   mutate(ints = as.numeric(as.character(cut(position,
                                             breaks = seq(0, max(position), window_size),
                                             labels = seq(window_size, max(position), window_size)))),
