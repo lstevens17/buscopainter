@@ -1,31 +1,22 @@
 #!/usr/bin/env Rscript
+library(ggplot2)
 library(tidyverse)
 
-# get args
-args = commandArgs(trailingOnly=TRUE)
-locations <- read_tsv(args[1])
-window_size = 1000000
+# collect args
+args <- commandArgs(trailingOnly=TRUE)
+locations_table <- read.table(args[1], header=TRUE)
 
-p <- filter(locations) %>%
+filtered_table <- locations_table %>%
   group_by(query_chr) %>%
-  mutate(gene_count = n(), max_position = max(position)) %>%
-  filter(gene_count > 1) %>%
-  mutate(ints = as.numeric(as.character(cut(position,
-                                            breaks = seq(0, max(position), window_size),
-                                            labels = seq(window_size, max(position), window_size)))),
-         ints = ifelse(is.na(ints), max(ints, na.rm = T) + window_size, ints)) %>%
-  count(ints, assigned_chr, query_chr) %>%
-  ungroup() %>%
-  ggplot(aes(fill=assigned_chr, y=n, x=ints-window_size)) + 
-  facet_grid(query_chr ~ ., scales = "free") +
-  geom_bar(position="stack", stat="identity") + 
-  theme_classic() + 
-  xlab("Chromosome position (Mb)") + ylab("BUSCO count (n)") + 
-  theme(panel.border = element_blank(), text = element_text(size=10), strip.text.y = element_text(angle = 0))
+  filter(n()>10)
 
-ggsave("buscopainter.pdf", plot = p, width = 20, height = 24, units = "cm", device = "pdf")
+p <- ggplot(filtered_table) +
+  geom_rect(aes(xmin=position-2e4, xmax=position+2e4, ymax=0, ymin =10, fill=assigned_chr)) +
+  facet_wrap(query_chr ~ ., ncol=1) +
+  xlab("Position (Mb)") +
+  scale_x_continuous(labels=function(x)x/1e6, , expand=c(0.005,0)) +
+  scale_y_continuous(breaks=NULL) +
+  theme(text = element_text(size=10), strip.text.y = element_text(angle = 0), panel.background = element_rect(fill = "white", colour = "black"), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-
-  
-        
-
+ggsave(paste(args[1], "buscopainter.pdf", sep = "_"), plot = p, width = 15, height = 24, units = "cm", device = "pdf")
+ggsave(paste(args[1], "buscopainter.png", sep = "_"), plot = p, width = 15, height = 24, units = "cm", device = "png")
