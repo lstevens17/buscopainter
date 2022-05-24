@@ -54,9 +54,9 @@ def print_location_table(reference_table_dict, query_table_dict, location_table_
 			position = (query_start + query_stop)/2
 			try:
 				reference_chr = reference_table_dict[buscoID][0]
+				location_table.write("%s\t%s\t%s\t%s" % (buscoID, query_chr, position, reference_chr) + "\n")
 			except KeyError:
 				pass
-			location_table.write("%s\t%s\t%s\t%s" % (buscoID, query_chr, position, reference_chr) + "\n")
 
 if __name__ == "__main__":
 	SCRIPT = "buscopainter.py"
