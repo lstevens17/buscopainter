@@ -21,7 +21,7 @@ p <- locations %>%
 
 # Save results
 ggsave(paste(args[1], "_buscopainter.pdf", sep = ""), plot = p, width = 15, height = 30, units = "cm", device = "pdf")
-ggsave(paste(args[1], "_buscopainter.png", sep = ""), plot = p, width = 15, height = 30 units = "cm", device = "png")
+ggsave(paste(args[1], "_buscopainter.png", sep = ""), plot = p, width = 15, height = 30, units = "cm", device = "png")
 
 
 
